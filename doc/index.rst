@@ -57,7 +57,7 @@ Download
 
 The |datastack| package is available for download at
 `<http://cxc.harvard.edu/contrib/datastack/downloads>`_.  That directory also
-contains the example scripts and data ``examples.tar.gz``.
+contains the example data files ``examples_data.tar.gz``.
 
 Installation
 =============
@@ -68,7 +68,7 @@ is to untar the package tarball, change into the source directory, and initializ
 the CIAO environment::
 
   tar zxvf datastack-<version>.tar.gz
-  tar zxvf examples.tar.gz -C datastack-<version>/examples  
+  tar zxvf examples_data.tar.gz -C datastack-<version>/
   cd datastack-<version>
   source /PATH/TO/ciao/bin/ciao.csh
 
