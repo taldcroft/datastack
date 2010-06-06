@@ -1,0 +1,5 @@
+include doc/*.rst
+include examples/*.py
+include examples/data/*
+exclude test_*
+exclude print_sherpa_synopses.py

@@ -1,0 +1,332 @@
+add_user_pars             Add parameters to a user model
+calc_chisqr               Return the chi squared statistic contribution by bin
+calc_data_sum             Get observed data counts
+calc_data_sum2d           Get observed image counts
+calc_energy_flux          Get the unconvolved energy flux
+calc_kcorr                Calculate the k correction
+calc_model_sum            Get the sum of convolved model amplitudes
+calc_model_sum2d          Get the sum of convolved image model amplitudes
+calc_photon_flux          Get the unconvolved photon flux
+calc_source_sum           Get the sum of unconvolved model amplitudes
+calc_source_sum2d         Get the sum of unconvolved image model amplitudes
+calc_stat                 Return the statistic value
+clean                     
+conf                      Estimate confidence intervals for selected thawed parameters
+conf                      Estimate confidence intervals for selected thawed parameters
+contour                   Send a combination contour plot to the visualizer
+contour_data              Send a data contour plot to the visualizer
+contour_fit               Send a fit contour plot to the visualizer
+contour_fit_resid         Send fit and residual contours plot to the visualizer
+contour_kernel            Send a PSF kernel contour to the visualizer
+contour_model             Send a model contour plot to the visualizer
+contour_psf               Send a PSF contour to the visualizer
+contour_ratio             Send a ratio plot to the visualizer
+contour_resid             Send a residuals contour plot to the visualizer
+contour_source            Send a source contour plot to the visualizer
+copy_data                 Copy a dataset by data id to a new data id (deep copy)
+covar                     Estimate confidence intervals for selected thawed parameters
+covar                     Estimate confidence intervals for selected thawed parameters
+create_model_component    Create a new Sherpa model component
+dataspace1d               Populates a blank 1D Sherpa data set by id
+dataspace2d               Populates a blank 2D Sherpa image data set by data id
+delete_bkg_model          Remove a bkg model by data id and bkg id
+delete_data               Delete a dataset by data id
+delete_model              Delete a Sherpa model by model id
+delete_model_component    Delete a Sherpa model component from active models
+delete_psf                Delete the specified PSF model by Sherpa data id.
+eqwidth                   Get equivalent width
+fake                      Fake source data using supplied noise function by data id
+fake_pha                  Create and fill a Sherpa DataPHA dataset by data id
+fit                       Perform fitting process using current optimization method and
+fit_bkg                   Perform fitting process on PHA backgrounds using current
+freeze                    Freeze a list of parameters
+get_analysis              Get the current quantity for analysis of a PHA data set by data id
+get_areascal              Get the source or background fractional area by id
+get_arf                   Return an ARF dataset by data id and response id
+get_arf_plot              Return a Sherpa ancillary response plot
+get_axes                  Get the alternate grid of a dataset by id
+get_backscal              Get the source or background extraction region areas by id
+get_bkg                   Return an background PHA dataset by data id and bkg_id
+get_bkg_arf               Return a bkg ARF dataset by data id using default bkg_id and resp_id
+get_bkg_chisqr_plot       Return a Sherpa background chisqr plot
+get_bkg_delchi_plot       Return a Sherpa background delchi plot
+get_bkg_fit_plot          Return a Sherpa background fit plot
+get_bkg_model             Return the background convolved model by data id and bkg id
+get_bkg_model_plot        Return a Sherpa background convolved model plot
+get_bkg_plot              Return a Sherpa background data plot
+get_bkg_ratio_plot        Return a Sherpa background ratio plot
+get_bkg_resid_plot        Return a Sherpa background residuals plot
+get_bkg_rmf               Return a bkg RMF dataset by data id using default bkg_id and resp_id
+get_bkg_source            Return the background unconvolved model by data id and bkg id
+get_bkg_source_plot       Return a Sherpa background source plot
+get_chisqr_plot           Return a Sherpa chi square plot
+get_conf                  Access current conf estimation method object
+get_conf_opt              Return a confidence option by name
+get_conf_results          Access confidence estimation results object
+get_conf_results          Access confidence estimation results object
+get_coord                 Get the coordinate system by data id
+get_dep                   Get the dependent variable of a dataset by id
+get_covar                 Access current covar estimation method object
+get_covar_opt             Return a covariance option by name
+get_covar_results         Access covariance estimation results object
+get_covar_results         Access covariance estimation results object
+get_data                  Return a Sherpa dataset by data id
+get_data_contour          Return a Sherpa data contour
+get_data_contour_prefs    Return data contour preferences
+get_data_image            Return a Sherpa data image obj
+get_data_plot             Return a Sherpa data plot
+get_data_plot_prefs       Return data plot preferences
+get_default_id            Return the default Sherpa data id
+get_delchi_plot           Return a Sherpa delta chi plot
+get_dep                   Get the dependent variable of a dataset by id
+get_dims                  Get the dimensionality of a dataset by id
+get_energy_flux_hist      Return a Sherpa energy flux histogram
+get_error                 Get the total errors of a dataset by id
+get_exposure              Get the source or background exposure times by id
+get_filter                Get the filter of a dataset by id
+get_fit_contour           Return a Sherpa fit contour
+get_fit_plot              Return a Sherpa fit plot
+get_fit_results           Return results from the last fit performed
+get_functions             Return all available Sherpa functions in a list
+get_grouping              Retrieve the grouping flags by data id
+get_indep                 Get the independent grid of a dataset by id
+get_int_proj              Return a confidence plot of fit statistic vs. a thawed parameter
+get_int_unc               Return a confidence plot of fit statistic vs. parameter value.  At
+get_kernel_contour        Return a Sherpa PSF kernel contour
+get_kernel_image          Return a Sherpa PSF kernel image obj
+get_kernel_plot           Return a Sherpa PSF kernel plot
+get_method                Return the Sherpa optimization method by name
+get_method_name           Return the name of current Sherpa optimization method
+get_method_opt            Return a Sherpa optimization method option by name
+get_model                 Return a Sherpa model by model id
+get_model_autoassign_func Return a function pointer to the model assignment function
+get_model_contour         Return a Sherpa model contour
+get_model_contour_prefs   Return model contour preferences
+get_model_image           Return a Sherpa model image obj
+get_model_pars            Return a list of Sherpa model parameters by model or model
+get_model_plot            Return a Sherpa model plot
+get_model_plot_prefs      Return model plot preferences
+get_model_type            Return a Sherpa model type by model or model expression string
+get_num_par               Return the number of parameters in a Sherpa model
+get_num_par_frozen        Return the number of frozen parameters in a Sherpa model
+get_num_par_thawed        Return the number of thawed parameters in a Sherpa model
+get_order_plot            Return a Sherpa order plot
+get_par                   Return a model parameter
+get_photon_flux_hist      Return a Sherpa photon flux histogram
+get_pileup_model          Return a jdpileup model by data id
+get_proj                  Access current proj estimation method object
+get_proj_opt              Return a projection option by name
+get_proj_results          Access projection estimation results object
+get_proj_results          Access projection estimation results object
+get_psf                   Return a PSF model by Sherpa data id
+get_psf_contour           Return a Sherpa PSF contour
+get_psf_image             Return a Sherpa PSF image obj
+get_psf_plot              Return a Sherpa PSF plot
+get_quality               Retrieve the quality flags by data id
+get_rate                  Get the measured count rate of a dataset by id
+get_ratio_contour         Return a Sherpa ratio contour
+get_ratio_image           Return a Sherpa ratio image obj
+get_ratio_plot            Return a Sherpa ratio plot
+get_reg_proj              Return a confidence contour of fit statistic vs. two thawed
+get_reg_unc               Return a confidence contour of fit statistic vs. two thawed
+get_resid_contour         Return a Sherpa resid contour
+get_resid_image           Return a Sherpa resid image obj
+get_resid_plot            Return a Sherpa resid plot
+get_rmf                   Return an RMF dataset by data id and response id
+get_source                Return a Sherpa model by model id
+get_source_contour        Return a Sherpa source contour
+get_source_image          Return a Sherpa source image obj
+get_source_plot           Return a Sherpa source plot
+get_specresp              Get the effective area of a PHA spectrum by id
+get_split_plot            Return a Sherpa split plot
+get_stat                  Return a Sherpa statistic by name
+get_stat_name             Return the current Sherpa statistic by name
+get_staterror             Get the statistical errors of a dataset by id
+get_syserror              Get the systematic errors of a dataset by id
+group                     Turn grouping ON
+group_adapt               Create and set grouping flags adaptively so that each group contains
+group_adapt_snr           Create and set grouping flags adaptively so that each group contains
+group_bins                Create and set grouping flags by number of bins with equal-widths
+group_counts              Create and set grouping flags using minimum number of counts per bin
+group_snr                 Create and set grouping flags so each group has a signal-to-noise
+group_width               Create and set grouping flags by a bin width.
+guess                     Guess the parameters values of model from the data
+histogram1d               
+histogram2d               
+ignore                    Exclusive 1D ignore on interval(s) for all available
+ignore2d                  Ignore a region mask for all Sherpa DataIMG datasets
+ignore2d_id               Ignore a region mask for specific Sherpa DataIMG datasets
+ignore_bad                Ignore bins according to quality flags
+ignore_id                 Exclusive 1D ignore on interval(s) for specific Sherpa data id(s)
+image_close               Close a image visualizer window
+image_data                Send a data image to the visualizer
+image_deleteframes        Delete frames in image visualizer
+image_fit                 Send a fit image to the visualizer
+image_getregion           Return a visualizer image region
+image_kernel              Send a PSF kernel image to the visualizer
+image_model               Send a model image to the visualizer
+image_open                Open a image visualizer window
+image_psf                 Send a PSF image to the visualizer
+image_ratio               Send a ratio image to the visualizer
+image_resid               Send a resid image to the visualizer
+image_setregion           Set a visualizer image region
+image_source              Send a source image to the visualizer
+image_xpaget              Return an XPA data stream
+image_xpaset              Send an XPA data stream
+int_proj                  Create a confidence plot of fit statistic vs. a thawed parameter
+int_unc                   Create a confidence plot of fit statistic vs. parameter value.  At
+link                      Link a parameter with an associated value
+list_bkg_ids              List the available Sherpa background ids for a data set by data id
+list_data_ids             List the available Sherpa data ids
+list_functions            List all available Sherpa functions
+list_methods              List the available optimization methods in Sherpa
+list_model_components     List the Sherpa model components of active models
+list_model_ids            List the Sherpa session model ids
+list_models               List the available Sherpa model types
+list_response_ids         List the available Sherpa response ids for a data set by data id
+list_stats                List statistics available in Sherpa
+load_arf                  Loads ARF data by id
+load_arrays               Load NumPy arrays into a dataset
+load_ascii                Load ASCII data by id
+load_bkg                  Load background PHA data by id
+load_bkg_arf              Loads bkg ARF data by id and default bkg_id and default resp_id
+load_bkg_rmf              Loads bkg RMF data by id using default bkg_id and default resp_id
+load_conv                 load a file-based or model-based kernel into a convolution model
+load_data                 Load spectrum, table, or ASCII data by id
+load_filter               Load the dataset filter from file
+load_grouping             Load the dataset grouping flags from file
+load_image                Load image data by id
+load_multi_arfs           Loads multiple ARF data files by id and resp_id
+load_multi_rmfs           Loads multiple RMF data files by id and resp_id
+load_pha                  Load PHA data by id
+load_psf                  load a file-based or model-based kernel into a PSF model
+load_quality              Load the dataset quality flags from file
+load_rmf                  Loads RMF data by id
+load_staterror            Load the statistical errors for a dataset from file
+load_syserror             Load the systematic errors for a dataset from file
+load_table                Load data by id
+load_table_model          Load a table model from file into a Sherpa session
+load_user_model           Load a table model from file into a Sherpa session
+load_user_stat            Load a user defined statistic into a Sherpa session
+notice                    Exclusive 1D notice on interval(s) for all available
+notice2d                  Notice a region mask for all Sherpa DataIMG datasets
+notice2d_id               Notice a region mask for specific Sherpa DataIMG datasets
+notice_id                 Exclusive 1D notice on interval(s) for specific Sherpa data id(s)
+pack_image                Pack image data by id
+pack_pha                  Pack PHA data by id
+pack_table                Pack tabular data by id
+paramprompt               Prompts the user for initial, minimum, and maximum parameter values
+plot                      Send a combination plot to the visualizer
+plot_arf                  Plot ancillary response data
+plot_bkg                  Plot background counts
+plot_bkg_chisqr           Plot background chi squared contributions
+plot_bkg_delchi           Plot background delta chi
+plot_bkg_fit              Plot background counts with fitted background model
+plot_bkg_fit_delchi       Send background fit and background delta chi plots to the visualizer
+plot_bkg_fit_resid        Send background fit and background residuals plots to the visualizer
+plot_bkg_model            Plot background convolved model
+plot_bkg_ratio            Plot background ratio
+plot_bkg_resid            Plot background residuals
+plot_bkg_source           Plot the unconvolved background model
+plot_bkg_source           Plot the unconvolved background model
+plot_chisqr               Send a chi^2 plot to the visualizer
+plot_data                 Send a data plot to the visualizer
+plot_delchi               Send a delta chi plot to the visualizer
+plot_energy_flux          Send a energy flux distribution to the visualizer
+plot_fit                  Send a fit plot to the visualizer
+plot_fit_delchi           Send fit and delta chi plots to the visualizer
+plot_fit_resid            Send fit and residuals plots to the visualizer
+plot_kernel               Send a PSF kernel plot to the visualizer
+plot_model                Send a model plot to the visualizer
+plot_order                Plot convolved source model by multiple response order
+plot_photon_flux          Send a photon flux distribution to the visualizer
+plot_psf                  Send a PSF plot to the visualizer
+plot_ratio                Send a ratio plot to the visualizer
+plot_resid                Send a residuals plot to the visualizer
+plot_source               Plot unconvolved source model
+proj                      Estimate confidence intervals for selected thawed parameters
+proj                      Estimate confidence intervals for selected thawed parameters
+reg_proj                  Create a confidence contour of fit statistic vs. two thawed
+reg_unc                   Create a confidence contour of fit statistic vs. two thawed
+reset                     Resets model parameter values to defaults
+restore                   Restore a previous Sherpa session from a pickled file
+sample_energy_flux        Get a sample the of energy flux
+sample_photon_flux        Get a sample the of photon flux
+save                      Save the current Sherpa session to a pickled file
+save_all                  
+save_arrays               Write a list of arrays to file as columns
+save_data                 Write a data set to file by id
+save_delchi               Write the delta chi squared residuals to file
+save_error                Write the total errors of a data set to file
+save_filter               Write the data set filter to file
+save_grouping             Write PHA grouping flags by id
+save_image                Write image data by id
+save_model                Write the convolved source model to file
+save_pha                  Write PHA data by id
+save_quality              Write PHA quality flags by id
+save_resid                Write the data - model residuals to file
+save_source               Write the unconvolved source model to file
+save_staterror            Write the data set statistical errors to file
+save_syserror             Write the data set systematic errors to file
+save_table                Write tabular data by id
+set_analysis              Set the quantities for analysis of a PHA data set by data id
+set_areascal              Set the source or background fractional area by id
+set_arf                   Set an ARF dataset by data id and response id
+set_backscal              Set the source or background extraction region areas by id
+set_bkg                   Set a background PHA dataset by data id and
+set_bkg_model             Set a bkg model by data id and bkg id
+set_conf_opt              Set a confidence option by name
+set_coord                 Set the coordinate system by data id
+set_dep                   Set the dependent variable of a dataset by id
+set_covar_opt             Set a covariance option by name
+set_data                  Set a dataset by Sherpa data id
+set_default_id            Set the default Sherpa data id
+set_dep                   Set the dependent variable of a dataset by id
+set_exposure              Set the source or background exposure times by id
+set_filter                Set the dataset filter by data id
+set_grouping              Apply user defined grouping flags by data id
+set_method                Set the Sherpa optimization method by name
+set_method_opt            Set a Sherpa optimization method option by name
+set_model                 Set a Sherpa model by model id
+set_model_autoassign_func Sets the model assignment function to a user defined function
+set_par                   Set initial values for a model parameter
+set_pileup_model          Set a jdpileup model by data id
+set_proj_opt              Set a projection option by name
+set_psf                   Add a PSF model by Sherpa data id
+set_quality               Apply user defined quality flags by data id
+set_rmf                   Set an RMF dataset by data id and response id
+set_model                 Set a Sherpa model by model id
+set_stat                  Set the current Sherpa statistic by name
+set_staterror             Set the statistical errors of a dataset by id
+set_syserror              Set the systematic errors of a dataset by id
+show_all                  Show current state of Sherpa fitting session
+show_bkg                  Show the Sherpa PHA background data set
+show_bkg_model            Show the background model (convolved)
+show_bkg_source           Show the background source model (unconvolved)
+show_conf                 Show results from last time confidence was run
+show_covar                Show results from the last time covariance was run to
+show_data                 Show Sherpa datasets
+show_filter               Show filters on Sherpa datasets
+show_fit                  Show results from the last Sherpa fit performed
+show_kernel               Show Sherpa PSF kernels
+show_method               Show the current Sherpa method
+show_model                Show Sherpa models
+show_proj                 Show results from last time projection was run
+show_psf                  Show Sherpa PSF model with PSF kernel
+show_source               Show Sherpa sources
+show_stat                 Show the current Sherpa statistic
+fit                       Perform fitting process using current optimization method and
+subtract                  Subtract background counts
+thaw                      Thaw a list of parameters
+ungroup                   Turn grouping OFF
+unlink                    Unlink a parameter
+unpack_arf                Read ARF data into a dataset
+unpack_arrays             Read NumPy arrays into a dataset
+unpack_ascii              Read ASCII data into a dataset
+unpack_pha                Read PHA data into a dataset
+unpack_data               Read spectrum, table, or ASCII data into a dataset
+unpack_image              Read image data into a dataset
+unpack_pha                Read PHA data into a dataset
+unpack_rmf                Read RMF data into a dataset
+unpack_table              Read data into a dataset
+unsubtract                Ignore subtraction of background counts

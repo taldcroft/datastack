@@ -9,6 +9,31 @@ multiple datasets.
 :Copyright: Smithsonian Astrophysical Observatory (2010)
 :Author: Tom Aldcroft (aldcroft@head.cfa.harvard.edu)
 """
+## Copyright (c) 2010, Smithsonian Astrophysical Observatory
+## All rights reserved.
+## 
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted provided that the following conditions are met:
+##     * Redistributions of source code must retain the above copyright
+##       notice, this list of conditions and the following disclaimer.
+##     * Redistributions in binary form must reproduce the above copyright
+##       notice, this list of conditions and the following disclaimer in the
+##       documentation and/or other materials provided with the distribution.
+##     * Neither the name of the Smithsonian Astrophysical Observatory nor the
+##       names of its contributors may be used to endorse or promote products
+##       derived from this software without specific prior written permission.
+## 
+## THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+## ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+## WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+## DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+## DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+## (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+## LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+## ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+## (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS  
+## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 import sys
 import types
 import re
@@ -16,9 +41,36 @@ import ConfigParser
 import numpy
 import sherpa
 import sherpa.astro.ui as ui
-import clogging
+import logging
 
-# Get plot package
+# Configure logging for the module
+def _config_logger(name, level, stream):
+    logger = logging.getLogger(name)
+    for hdlr in logger.handlers:
+        logger.removeHandler(hdlr)
+    logger.setLevel(level)
+    logger.propagate = False
+
+    fmt = logging.Formatter('Datastack: %(message)s', None)
+    hdlr = logging.StreamHandler(stream)
+    # hdlr.setLevel(level)
+    hdlr.setFormatter(fmt)
+    logger.addHandler(hdlr)
+
+    return logger
+logger = _config_logger(__name__, level=logging.INFO, stream=sys.stdout)
+
+def set_stack_verbose(verbose=True):
+    """Configure whether stack functions print informational messages.
+    :param verbose: print messages if True (default=True)
+    :returns: None
+    """
+    if verbose:
+        logger.setLevel(logging.INFO)
+    else:
+        logger.setLevel(logging.WARNING)
+
+# Get plot package 
 _cp = ConfigParser.ConfigParser()
 _cp.read(sherpa.get_config())
 _plot_pkg =  _cp.get('options', 'plot_pkg')
@@ -28,8 +80,6 @@ elif _plot_pkg == 'chips':
     import pychips
 else:
     raise ValueError('Unknown plot package {0}'.format(_plot_pkg))
-
-logger = clogging.config_logger(__name__, level=clogging.DEBUG)
 
 # Global list of dataset ids in use
 _all_dataset_ids = {}
@@ -62,12 +112,34 @@ class DataStack(object):
         self.getitem_ids = ids
         return self
 
-##    __del__ behaves unpredictably, skip this.
-##    def __del__(self):
-##        print 'here', self.dataset_ids
-##        for dataid in self.dataset_ids:
-##            logger.debug('Deleting dataset {0}'.format(dataid))
-##            # print _all_dataset_ids[dataid]
+    def __del__(self):
+        for dataid in self.dataset_ids:
+            try:
+                del _all_dataset_ids[dataid]
+            except:
+                pass
+
+    def clear_stack(self):
+        """Clear all datasets in the stack.
+        :returns: None
+        """
+        for dataid in self.dataset_ids:
+            del _all_dataset_ids[dataid]
+        self.__init__()
+
+    def show_stack(self):
+        """Show the data id and file name (where meaningful) for selected
+        datasets in stack.
+        :returns: None
+        """
+        for dataset in self.filter_datasets():
+            logger.info('{0}: {1}'.format(dataset['id'], dataset['data'].name))
+
+    def get_stack_ids(self):
+        """Get the ids for all datasets in stack
+        :returns: list of ids
+        """
+        return self.ids
 
     @property
     def ids(self):
@@ -75,9 +147,9 @@ class DataStack(object):
         return [x['id'] for x in self.datasets]
 
     def _load_func_factory(load_func):
+        """Override a native Sherpa data loading function."""
         def _load(self, *args, **kwargs):
-            """
-            Load a dataset and add to the datasets for stacked analysis.
+            """Load a dataset and add to the datasets for stacked analysis.
             """
             if self.getitem_ids:
                 dataid = self.getitem_ids[0]
@@ -90,10 +162,10 @@ class DataStack(object):
             if dataid in self.dataset_ids:
                 raise ValueError('Data ID = {0} is already in the DataStack'.format(dataset['id']))
 
-            logger.debug('Loading dataset id %s' % dataid)
+            logger.info('Loading dataset id %s' % dataid)
             out = load_func(dataid, *args, **kwargs)
 
-            dataset = dict(id=dataid, args=args, model_comps={})
+            dataset = dict(id=dataid, args=args, model_comps={}, data=ui.get_data(dataid))
             dataset.update(kwargs)  # no sherpa load func 'args' keyword so no conflict
             _all_dataset_ids[dataid] = dataset
             self.dataset_ids[dataid] = dataset
@@ -110,11 +182,9 @@ class DataStack(object):
     load_data = _load_func_factory(ui.load_data)
     load_image = _load_func_factory(ui.load_image)
     load_pha = _load_func_factory(ui.load_pha)
-    load_id = _load_func_factory(_null_func)
 
     def _set_model(self, model_expr, set_model_func, model_expr_attr):
-        """
-        Create a source or background model for each dataset.
+        """Create a source or background model for each dataset.
 
         Defines::
 
@@ -124,7 +194,7 @@ class DataStack(object):
         :param model_expr: string expression defining src/bkg model
         :param set_model_func: either ui.set_source or ui.set_bkg_model
         :param model_expr_attr: either 'srcmodel' or 'bkgmodel'
-        :rtype: None
+        :returns: None
         """
         setattr(self, model_expr_attr, model_expr)
         model_expr_comps = getattr(self, model_expr_attr + '_comps')
@@ -140,7 +210,7 @@ class DataStack(object):
         
         # Create all model expression components so they can be used later
         # to create composite source models for each dataset
-        for dataset in self.datasets:
+        for dataset in self.filter_datasets():
             model_expr = getattr(self, model_expr_attr)
             for model_expr_comp in reversed(model_expr_comps):
                 model_comp = {}
@@ -155,7 +225,7 @@ class DataStack(object):
                 model_comp_name = re.sub(r'#', '', model_expr_comp['name'])
                 model_expr = model_expr[:i0] + model_comp['type.uniq_name'] + model_expr[i1:]
 
-            logger.debug('Setting %s for dataset %d = %s' % (model_expr_attr, dataset['id'], model_expr))
+            logger.info('Setting %s for dataset %d = %s' % (model_expr_attr, dataset['id'], model_expr))
             set_model_func(dataset['id'], model_expr)
         
     def set_source(self, model_expr):
@@ -166,6 +236,9 @@ class DataStack(object):
         self._set_model(model_expr, ui.set_bkg_model, 'bkgmodel')
 
     def filter_datasets(self):
+        """Return filtered list of datasets as specified in the __getitem__
+        argument (via self.getitem_ids which gets set in __getitem__).
+        """
         if self.getitem_ids is None:
             return self.datasets
 
@@ -175,36 +248,22 @@ class DataStack(object):
         try:
             return [self.dataset_ids[x] for x in filter_ids]
         except KeyError:
-            raise ValueError('IDs = {0} not contained in dataset IDs = {1}'.format(ids, self.ids))
+            raise ValueError('IDs = {0} not contained in dataset IDs = {1}'.format(filter_ids, self.ids))
 
-    def _sherpa_cmd_factory(sherpa_func):
-        def _sherpa_cmd(self, *args, **kwargs):
+    def _sherpa_cmd_factory(func):
+        def wrapfunc(self, *args, **kwargs):
             """
             Apply an arbitrary Sherpa function to each of the datasets.  
             :rtype: List of results
             """
             datasets = self.filter_datasets()
-            logger.debug('Running {0} with args={1} and kwargs={2} for ids={3}'.format(
-                sherpa_func.__name__, args, kwargs, [x['id'] for x in datasets]))
-            return [sherpa_func(x['id'], *args, **kwargs) for x in datasets]
+            logger.info('Running {0} with args={1} and kwargs={2} for ids={3}'.format(
+                func.__name__, args, kwargs, [x['id'] for x in datasets]))
+            return [func(x['id'], *args, **kwargs) for x in datasets]
 
-        _sherpa_cmd.__name__ = sherpa_func.__name__
-        _sherpa_cmd.__doc__ = sherpa_func.__doc__
-        return _sherpa_cmd
-
-    def _sherpa_no_loop_factory(sherpa_func):
-        def _sherpa_cmd(self, *args, **kwargs):
-            """
-            Run an arbitrary Sherpa function and produce debug output.
-            :rtype: List of results
-            """
-            logger.debug('Running {0} with args={1} and kwargs={2}'.format(
-                sherpa_func.__name__, args, kwargs))
-            return sherpa_func(*args, **kwargs)
-
-        _sherpa_cmd.__name__ = sherpa_func.__name__
-        _sherpa_cmd.__doc__ = sherpa_func.__doc__
-        return _sherpa_cmd
+        wrapfunc.__name__ = func.__name__
+        wrapfunc.__doc__ = func.__doc__
+        return wrapfunc
 
     subtract = _sherpa_cmd_factory(ui.subtract)
     notice = _sherpa_cmd_factory(ui.notice_id)
@@ -212,9 +271,12 @@ class DataStack(object):
     get_bkg = _sherpa_cmd_factory(ui.get_bkg)
     get_source = _sherpa_cmd_factory(ui.get_source)
     get_bkg_model = _sherpa_cmd_factory(ui.get_bkg_model)
-    get_conf_results = _sherpa_no_loop_factory(ui.get_conf_results)
-    get_fit_results = _sherpa_no_loop_factory(ui.get_fit_results)
-    conf = _sherpa_no_loop_factory(ui.conf)
+    group_adapt = _sherpa_cmd_factory(ui.group_adapt)
+    group_adapt_snr = _sherpa_cmd_factory(ui.group_adapt_snr)
+    group_bins = _sherpa_cmd_factory(ui.group_bins)
+    group_counts = _sherpa_cmd_factory(ui.group_counts)
+    group_snr = _sherpa_cmd_factory(ui.group_snr)
+    group_width = _sherpa_cmd_factory(ui.group_width)
 
     def _sherpa_par(self, func, par, msg, *args, **kwargs):
         """Apply ``func(*args)`` to all model component or model component parameters named ``mcpar``.
@@ -244,29 +306,29 @@ class DataStack(object):
                 fullparname = '{0}.{1}'.format(uniqname, parname) if parname else uniqname
                 if fullparname not in processed_already:
                     if msg is not None:
-                        logger.debug(msg % fullparname)
+                        logger.info(msg % fullparname)
                     retvals.append(func(fullparname, *args, **kwargs))
                     processed_already.add(fullparname)
 
         return retvals
 
-    def thaw(self, par):
-        """Apply thaw command to specified parameter for each dataset.
+    def thaw(self, *pars):
+        """Apply thaw command to specified parameters for each dataset.
 
-        :param par: parameter specifier in format <model_type>.<par_name>
-        :param ids: list of dataset ids
+        :param pars: parameter specifiers in format <model_type>.<par_name>
         :rtype: None
         """
-        self._sherpa_par(ui.thaw, par, 'Thawing %s')
+        for par in pars:
+            self._sherpa_par(ui.thaw, par, 'Thawing %s')
 
-    def freeze(self, par):
-        """Apply freeze command to specified parameter for each dataset.
+    def freeze(self, *pars):
+        """Apply freeze command to specified parameters for each dataset.
 
-        :param par: parameter specifier in format <model_type>.<par_name>
-        :param ids: list of dataset ids
+        :param pars: parameter specifiers in format <model_type>.<par_name>
         :rtype: None
         """
-        self._sherpa_par(ui.freeze, par, 'Freezing %s')
+        for par in pars:
+            self._sherpa_par(ui.freeze, par, 'Freezing %s')
 
     def _get_parname_attr_pars(self, par, msg):
         parts = par.split('.')
@@ -304,7 +366,7 @@ class DataStack(object):
         for dataset in datasets[1:]:
             fullparname = '{0}.{1}'.format(dataset['model_comps'][name]['uniq_name'], parname)
             if fullparname != fullparname0:
-                logger.debug('Linking {0} => {1}'.format(fullparname, fullparname0))
+                logger.info('Linking {0} => {1}'.format(fullparname, fullparname0))
                 ui.link(fullparname, fullparname0)
 
     def unlink(self, par):
@@ -330,8 +392,17 @@ class DataStack(object):
     fit_bkg = _sherpa_fit_func(ui.fit_bkg)
     fit = _sherpa_fit_func(ui.fit)
 
-    def plot_print_window(self, *args, **kwargs):
+    # Doesn't work just now so hide from the public API
+
+
+    def _print_window(self, *args, **kwargs):
         """Save figure for each dataset.
+
+        Here is the text for index.rst:
+
+        In the ``print_window`` command if a filename is supplied (for saving to a
+        set of files) it should have a ``#`` character which will be replaced by the
+        dataset ``id`` in each case.
 
         :param args: list arguments to pass to print_window
         :param kwargs: named (keyword) arguments to pass to print_window
@@ -344,9 +415,9 @@ class DataStack(object):
                 filename = re.sub(r'#', str(dataset['id']), args[0])
                 args = tuple([filename]) + args[1:]
 
-            if _plot_pkg == 'pychips':
-                pychips.set_current_window(window_id)
-                func = pychips.plot_window
+            if _plot_pkg == 'chips':
+                pychips.set_current_window(dataset['id'])
+                func = pychips.print_window
             elif _plot_pkg == 'pylab':
                 plt.figure(self.ids.index(dataset['id']) + 1)
                 func = plt.savefig
@@ -355,7 +426,7 @@ class DataStack(object):
 
             func(*args, **kwargs)
 
-    plot_savefig = plot_print_window              # matplotlib alias for print_window
+    savefig = _print_window              # matplotlib alias for print_window
 
     def _sherpa_plot_func(func):
         def _sherpa_plot(self, *args, **kwargs):
@@ -367,12 +438,14 @@ class DataStack(object):
             :rtype: None
             """
             for dataset in self.filter_datasets():
-                if _plot_pkg == 'pychips':
+                if _plot_pkg == 'chips':
                     try:
                         pychips.add_window(['id', dataset['id']])
                     except RuntimeError:
                         pass  # already exists
-                    pychips.set_current_window(window_id)
+                    # window_id = pychips.ChipsId()
+                    # window_id.window = dataset['id']
+                    pychips.current_window(str(dataset['id']))
                 elif _plot_pkg == 'pylab':
                     plt.figure(self.ids.index(dataset['id']) + 1)
                 else:
@@ -384,7 +457,6 @@ class DataStack(object):
     # log_scale = _sherpa_plot_func(pychips.log_scale)
     # linear_scale = _sherpa_plot_func(pychips.linear_scale)
 
-    plot_fit = _sherpa_plot_func(ui.plot_fit)
     plot_arf = _sherpa_plot_func(ui.plot_arf)
     plot_bkg_fit = _sherpa_plot_func(ui.plot_bkg_fit)
     plot_bkg_ratio = _sherpa_plot_func(ui.plot_bkg_ratio)
@@ -441,38 +513,66 @@ class DataStack(object):
 
         return _matplotlib
 
-    plot_xlabel = _matplotlib_func(plt.xlabel)
-    plot_ylabel = _matplotlib_func(plt.ylabel)
-    plot_title = _matplotlib_func(plt.title)
-    plot_xlim = _matplotlib_func(plt.xlim)
-    plot_ylim = _matplotlib_func(plt.ylim)
-    plot_set_xscale = _matplotlib_func('set_xscale', axis_cmd=True)
-    plot_set_yscale = _matplotlib_func('set_yscale', axis_cmd=True)
+    if _plot_pkg == 'pylab':
+        plot_xlabel = _matplotlib_func(plt.xlabel)
+        plot_ylabel = _matplotlib_func(plt.ylabel)
+        plot_title = _matplotlib_func(plt.title)
+        plot_xlim = _matplotlib_func(plt.xlim)
+        plot_ylim = _matplotlib_func(plt.ylim)
+        plot_set_xscale = _matplotlib_func('set_xscale', axis_cmd=True)
+        plot_set_yscale = _matplotlib_func('set_yscale', axis_cmd=True)
+
 
 # Use this and subsequent loop to wrap every function in sherpa.astro.ui with a datastack version
-def datastack_wrap(func):
+def _sherpa_ui_wrap(func):
     def wrap(*args, **kwargs):
+        wrapfunc = func
         if args:
             if isinstance(args[0], DataStack): 
                 datastack, args = args[0], args[1:]
             elif isinstance(args[0], list):
                 datastack, args = (DATASTACK[args[0]] if args[0] else DATASTACK), args[1:]
+            else:
+                return func(*args, **kwargs) # No stack specifier so use native sherpa func
+
             try:
-                newfunc = getattr(datastack, func.__name__)
+                wrapfunc = getattr(datastack, func.__name__)
             except AttributeError:
-                newfunc = func
-            return newfunc(*args, **kwargs)
+                raise AttributeError(
+                    '{0} is not a stack-enabled function.'.format(func.__name__))
+
+        return wrapfunc(*args, **kwargs)
+
+    wrap.__name__ = func.__name__
+    wrap.__doc__ = func.__doc__
+    return wrap
+
+def _datastack_wrap(func):
+    def wrap(*args, **kwargs):
+        if not args:
+            args = ([],) + args
+
+        if isinstance(args[0], DataStack): 
+            datastack, args = args[0], args[1:]
+        elif isinstance(args[0], list):
+            datastack, args = (DATASTACK[args[0]] if args[0] else DATASTACK), args[1:]
         else:
-            return func(*args, **kwargs)
+            raise TypeError('First argument to {0} must be a list or datastack')
+
+        return getattr(datastack, func.__name__)(*args, **kwargs)
 
     wrap.__name__ = func.__name__
     wrap.__doc__ = func.__doc__
     return wrap
 
 DATASTACK = DataStack()  # Default datastack
+
+# Wrap all sherpa UI funcs and a few DataStack methods for command-line interface.
 _module = sys.modules[__name__]
 for attr in dir(ui):
     func = getattr(ui, attr)
     if type(func) == types.FunctionType:
-        setattr(_module, attr, datastack_wrap(func))
-        
+        setattr(_module, attr, _sherpa_ui_wrap(func))
+
+for funcname in ['clear_stack', 'show_stack', 'get_stack_ids']:
+    setattr(_module, funcname, _datastack_wrap(getattr(DataStack, funcname)))
