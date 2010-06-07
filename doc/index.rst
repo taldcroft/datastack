@@ -3,8 +3,6 @@
 .. |datastack| replace:: *datastack*
 .. |Datastack| replace:: *Datastack*
 
-Contents:
-
 .. toctree::
    :maxdepth: 2
 
@@ -268,7 +266,7 @@ get_stack_ids      Get a list of the ids in the stack
 set_stack_verbose  Set verbose mode (False => quiet)
 =================  ===================================
 
-Non-default or multiple data stacks are supported using ``object-oriented datastacks``.
+Non-default or multiple data stacks are supported using `object-oriented datastacks`_.
 
 Stack specifier
 ---------------
@@ -295,7 +293,7 @@ Within a Sherpa session these can be mixed freely::
   subtract(5)        # Subtract bkg for id=5 (native Sherpa)
 
 This distinction is generally sufficient.  Nevertheless some users may prefer
-to use ``object-oriented datastacks`` to keep everything tidy from the Python
+to use `object-oriented datastacks`_ to keep everything tidy from the Python
 programmer perspective.
 
 Data loading
@@ -354,16 +352,16 @@ Parameter manipulation
 
 |Datastack| supports the following commands for manipulating model parameters:
 
-=============  ==========================================
+=============  ================================================
 Command        Description
-=============  ==========================================
+=============  ================================================
 get_par        Return a list of model parameters
 set_par        Set initial values for a model parameter
 thaw           Thaw a list of parameters
 freeze         Freeze a list of parameters
 link           Link a parameter with an associated value
 unlink         Unlink a parameter
-=============  ==========================================
+=============  ================================================
 
 The `get_par`_ and `set_par`_ commands are extended in |datastack| to accept
 *any* attribute of a model component and not just a parameter name.  For
