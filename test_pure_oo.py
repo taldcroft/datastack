@@ -15,7 +15,9 @@ ds[1].load_arrays(x1, y1)  # ID required (autonumbering possible but potential p
 ds[2].load_arrays(x2, y2)
 ds[3].load_arrays(x3, y3)
 
-ds.set_source('const1d.const# * polynom1d.poly')
+# ds.set_source(ui.const1d.constID * ui.polynom1d.poly)
+ds.set_source('const1d.constID * polynom1d.poly')
+
 ds.freeze('poly')
 ds.thaw('poly.c0')
 ds.thaw('poly.c1')

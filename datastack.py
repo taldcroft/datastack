@@ -87,16 +87,61 @@ _all_dataset_ids = {}
 def _null_func(*args, **kwargs):
     pass
 
+def create_stack_model(model, id_, id_str='ID'):
+    model_comps = {}
+    def _get_new_model(model, level=0):
+        if hasattr(model, 'parts'):
+            # Recursively descend through model and create new parts (as needed)
+            # corresponding to the stacked model components.
+            newparts = []
+            for part in model.parts:
+                newparts.append(_get_new_model(part, level+1))
+
+            if hasattr(model, 'op'):
+                return model.op(*newparts)
+            elif isinstance(model, sherpa.astro.instrument.RMFModel):
+                return sherpa.astro.instrument.RMFModel(rmf=model.rmf, model=newparts[0],
+                                                        arf=model.arf, pha=model.pha)
+            elif isinstance(model, sherpa.astro.instrument.ARFModel):
+                return sherpa.astro.instrument.ARFModel(rmf=model.rmf, model=newparts[0],
+                                                        arf=model.arf, pha=model.pha)
+            else:
+                raise ValueError("Unexpected composite model {0} (not operator, ARF or RMF)".format(repr(model)))
+        else:
+            if isinstance(model, sherpa.models.model.ArithmeticConstantModel):
+                return model.val
+
+            try:
+                model_type, model_name_ID = model.name.split('.')
+            except ValueError:
+                raise ValueError('Model name "{0}" must be in format <model_type>.<name>'.format(model.name))
+
+            model_name = re.sub(id_str, str(id_), model_name_ID)
+            if id_str in model_name_ID:
+                try:
+                    model = getattr(getattr(sherpa.astro.ui, model_type), model_name)
+                except AttributeError:
+                    # Must be a user model, so use add_model to put a modelwrapper function into namespace
+                    sherpa.astro.ui.add_model(type(model))
+                    model = eval('{0}.{1}'.format(model_type, model_name))
+
+            model_name_no_ID = re.sub(id_str, "", model_name_ID)
+            model_comps[model_name_no_ID] = dict(model=model,
+                                                 model_name=model_name)
+
+            return model
+
+    return _get_new_model(model), model_comps
+
 class DataStack(object):
     """
     Manipulate a stack of data in Sherpa.
     """
     def __init__(self):
+        self.id_str = 'ID'
         self.getitem_ids = None
         self.datasets = []
         self.dataset_ids = {}           # Access datasets by ID
-        self.srcmodel_comps = []        # Generic model components in source model expression
-        self.bkgmodel_comps = []        # Generic model components in background model expression
 
     def __getitem__(self, item):
         """Overload datastack getitem ds[item(s)] to set self.filter_ids to a tuple
@@ -118,6 +163,13 @@ class DataStack(object):
                 del _all_dataset_ids[dataid]
             except:
                 pass
+
+    def clear_models(self):
+        """Clear all model components in the stack.
+        :returns: None
+        """
+        for dataset in self.datasets:
+            dataset['model_comps'] = {}
 
     def clear_stack(self):
         """Clear all datasets in the stack.
@@ -183,58 +235,40 @@ class DataStack(object):
     load_image = _load_func_factory(ui.load_image)
     load_pha = _load_func_factory(ui.load_pha)
 
-    def _set_model(self, model_expr, set_model_func, model_expr_attr):
-        """Create a source or background model for each dataset.
+    def _set_model_factory(func):
+        def wrapfunc(self, model):
+            """
+            Run a model-setting function for each of the datasets.  
+            :rtype: None
+            """
+            datasets = self.filter_datasets()
+            try:
+                # if model is passed as a string
+                model = eval(model, globals(), ui.__dict__)
+            except TypeError:
+                pass
+            except Exception, exc:
+                raise type(exc)('Error converting model "{0}" '
+                                 'to a sherpa model object: {1}'.format(model, exc))
+            for dataset in datasets:
+                id_ = dataset['id']
+                logger.info('Setting stack model using {0}() for id={1}'.format(
+                    func.__name__, id_))
+                new_model, model_comps = create_stack_model(model, id_, self.id_str)
+                func(id_, new_model)
+                dataset['model_comps'].update(model_comps)
+            return None
 
-        Defines::
+        wrapfunc.__name__ = func.__name__
+        wrapfunc.__doc__ = func.__doc__
+        return wrapfunc
 
-            self.{srcmodel,bkgmodel}_comps: list of dicts with info for each
-            component of the global srcmodel used as the source expression.
-
-        :param model_expr: string expression defining src/bkg model
-        :param set_model_func: either ui.set_source or ui.set_bkg_model
-        :param model_expr_attr: either 'srcmodel' or 'bkgmodel'
-        :returns: None
-        """
-        setattr(self, model_expr_attr, model_expr)
-        model_expr_comps = getattr(self, model_expr_attr + '_comps')
-
-        # Find the components in model expression, for instance
-        # xspowerlaw.pow is a model expression component
-        RE_model = re.compile(r'\b (\w+) \. ([\w#]+)', re.VERBOSE)
-        for match in RE_model.finditer(model_expr):
-            model_expr_comps.append(dict(type=match.group(1),
-                                         name=match.group(2),
-                                         start=match.start(),
-                                         end=match.end()))
-        
-        # Create all model expression components so they can be used later
-        # to create composite source models for each dataset
-        for dataset in self.filter_datasets():
-            model_expr = getattr(self, model_expr_attr)
-            for model_expr_comp in reversed(model_expr_comps):
-                model_comp = {}
-                model_comp['type'] = model_expr_comp['type']
-                model_comp['name'] = re.sub(r'#', '', model_expr_comp['name'])
-                model_comp['uniq_name'] = re.sub(r'#', str(dataset['id']), model_expr_comp['name'])
-                model_comp['type.uniq_name'] = '{0}.{1}'.format(model_comp['type'], model_comp['uniq_name'])
-                dataset['model_comps'][model_comp['name']] = model_comp
-
-                i0 = model_expr_comp['start']
-                i1 = model_expr_comp['end']
-                model_comp_name = re.sub(r'#', '', model_expr_comp['name'])
-                model_expr = model_expr[:i0] + model_comp['type.uniq_name'] + model_expr[i1:]
-
-            logger.info('Setting %s for dataset %d = %s' % (model_expr_attr, dataset['id'], model_expr))
-            set_model_func(dataset['id'], model_expr)
-        
-    def set_source(self, model_expr):
-        self._set_model(model_expr, ui.set_source, 'srcmodel')
-    set_model = set_source
-
-    def set_bkg_model(self, model_expr):
-        self._set_model(model_expr, ui.set_bkg_model, 'bkgmodel')
-
+    set_source = _set_model_factory(ui.set_source)
+    set_model = _set_model_factory(ui.set_model)
+    set_bkg_model = _set_model_factory(ui.set_bkg_model)
+    set_full_model = _set_model_factory(ui.set_full_model)
+    set_bkg_full_model = _set_model_factory(ui.set_bkg_full_model)
+    
     def filter_datasets(self):
         """Return filtered list of datasets as specified in the __getitem__
         argument (via self.getitem_ids which gets set in __getitem__).
@@ -268,6 +302,10 @@ class DataStack(object):
     subtract = _sherpa_cmd_factory(ui.subtract)
     notice = _sherpa_cmd_factory(ui.notice_id)
     ignore = _sherpa_cmd_factory(ui.ignore_id)
+    get_arf = _sherpa_cmd_factory(ui.get_arf)
+    get_rmf = _sherpa_cmd_factory(ui.get_rmf)
+    get_bkg_arf = _sherpa_cmd_factory(ui.get_bkg_arf)
+    get_bkg_rmf = _sherpa_cmd_factory(ui.get_bkg_rmf)
     get_bkg = _sherpa_cmd_factory(ui.get_bkg)
     get_source = _sherpa_cmd_factory(ui.get_source)
     get_bkg_model = _sherpa_cmd_factory(ui.get_bkg_model)
@@ -291,24 +329,25 @@ class DataStack(object):
 
         :rtype: numpy array of function return values ordered by shell
         """
+
         vals = par.split('.')
         name = vals[0]
         parname = (vals[1] if len(vals) > 1 else None)
         if len(vals) > 2:
             raise ValueError('Invalid parameter name specification "%s"' % par)
 
-        processed_already = set()
         retvals = []                       # return values
+        processed = set()
         for dataset in self.filter_datasets():
             model_comps = dataset['model_comps']
             if name in model_comps:
-                uniqname = model_comps[name]['uniq_name']
-                fullparname = '{0}.{1}'.format(uniqname, parname) if parname else uniqname
-                if fullparname not in processed_already:
+                model_name = model_comps[name]['model_name']
+                fullparname = '{0}.{1}'.format(model_name, parname) if parname else model_name
+                if fullparname not in processed:
                     if msg is not None:
                         logger.info(msg % fullparname)
                     retvals.append(func(fullparname, *args, **kwargs))
-                    processed_already.add(fullparname)
+                    processed.add(fullparname)
 
         return retvals
 
@@ -362,9 +401,9 @@ class DataStack(object):
         datasets = self.filter_datasets()
         name, parname = par.split('.')
 
-        fullparname0 = '{0}.{1}'.format(datasets[0]['model_comps'][name]['uniq_name'], parname)
+        fullparname0 = '{0}.{1}'.format(datasets[0]['model_comps'][name]['model_name'], parname)
         for dataset in datasets[1:]:
-            fullparname = '{0}.{1}'.format(dataset['model_comps'][name]['uniq_name'], parname)
+            fullparname = '{0}.{1}'.format(dataset['model_comps'][name]['model_name'], parname)
             if fullparname != fullparname0:
                 logger.info('Linking {0} => {1}'.format(fullparname, fullparname0))
                 ui.link(fullparname, fullparname0)
