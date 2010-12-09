@@ -304,17 +304,29 @@ class DataStack(object):
     ignore = _sherpa_cmd_factory(ui.ignore_id)
     get_arf = _sherpa_cmd_factory(ui.get_arf)
     get_rmf = _sherpa_cmd_factory(ui.get_rmf)
+    get_response = _sherpa_cmd_factory(ui.get_response)
     get_bkg_arf = _sherpa_cmd_factory(ui.get_bkg_arf)
     get_bkg_rmf = _sherpa_cmd_factory(ui.get_bkg_rmf)
     get_bkg = _sherpa_cmd_factory(ui.get_bkg)
     get_source = _sherpa_cmd_factory(ui.get_source)
+    get_model = _sherpa_cmd_factory(ui.get_model)
     get_bkg_model = _sherpa_cmd_factory(ui.get_bkg_model)
+    try:
+        get_bkg_scale = _sherpa_cmd_factory(ui.get_bkg_scale)
+    except AttributeError:
+        pass  # not available for CIAO < 4.3
     group_adapt = _sherpa_cmd_factory(ui.group_adapt)
     group_adapt_snr = _sherpa_cmd_factory(ui.group_adapt_snr)
     group_bins = _sherpa_cmd_factory(ui.group_bins)
     group_counts = _sherpa_cmd_factory(ui.group_counts)
     group_snr = _sherpa_cmd_factory(ui.group_snr)
     group_width = _sherpa_cmd_factory(ui.group_width)
+    load_arf = _sherpa_cmd_factory(ui.load_arf)
+    load_rmf = _sherpa_cmd_factory(ui.load_rmf)
+    load_bkg_arf = _sherpa_cmd_factory(ui.load_bkg_arf)
+    load_bkg_rmf = _sherpa_cmd_factory(ui.load_bkg_rmf)
+    load_filter = _sherpa_cmd_factory(ui.load_filter)
+    load_grouping = _sherpa_cmd_factory(ui.load_grouping)
 
     def _sherpa_par(self, func, par, msg, *args, **kwargs):
         """Apply ``func(*args)`` to all model component or model component parameters named ``mcpar``.
@@ -430,8 +442,7 @@ class DataStack(object):
 
     fit_bkg = _sherpa_fit_func(ui.fit_bkg)
     fit = _sherpa_fit_func(ui.fit)
-
-    # Doesn't work just now so hide from the public API
+    conf = _sherpa_fit_func(ui.conf)
 
 
     def _print_window(self, *args, **kwargs):
@@ -516,7 +527,7 @@ class DataStack(object):
     plot_resid = _sherpa_plot_func(ui.plot_resid)
     plot_bkg_delchi = _sherpa_plot_func(ui.plot_bkg_delchi)
     plot_bkg_model = _sherpa_plot_func(ui.plot_bkg_model)
-    plot_bkg_unconvolved = _sherpa_plot_func(ui.plot_bkg_unconvolved)
+    plot_bkg_source = _sherpa_plot_func(ui.plot_bkg_source)
     plot_fit = _sherpa_plot_func(ui.plot_fit)
     plot_order = _sherpa_plot_func(ui.plot_order)
     plot_source = _sherpa_plot_func(ui.plot_source)
@@ -538,7 +549,7 @@ class DataStack(object):
 
                 if len(args) > 0:
                     try:
-                        arg0 = re.sub(r'#', str(dataset['id']), args[0])
+                        arg0 = re.sub('#', str(dataset['id']), args[0])
                         args = tuple([arg0]) + args[1:]
                     except TypeError:
                         pass
@@ -553,6 +564,7 @@ class DataStack(object):
         return _matplotlib
 
     if _plot_pkg == 'pylab':
+        plot_savefig = _matplotlib_func(plt.savefig)
         plot_xlabel = _matplotlib_func(plt.xlabel)
         plot_ylabel = _matplotlib_func(plt.ylabel)
         plot_title = _matplotlib_func(plt.title)
