@@ -234,6 +234,7 @@ class DataStack(object):
     load_data = _load_func_factory(ui.load_data)
     load_image = _load_func_factory(ui.load_image)
     load_pha = _load_func_factory(ui.load_pha)
+    load_bkg = _load_func_factory(ui.load_bkg)
 
     def _set_model_factory(func):
         def wrapfunc(self, model):
