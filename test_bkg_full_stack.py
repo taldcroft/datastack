@@ -20,13 +20,7 @@ bkg_models = [const1d.c1 * acis_bkg_model('acis7s'),
               const1d.c2 * acis_bkg_model('acis7s')]
 bkg_rsps = get_response([], bkg_id=1)
 
-if 0:
-    bkg_model = scale1d.bkg_constID * acis_bkg_model('acis2i')
-    src_model = const1d.src_constID * xsphabs.abs1 * powlaw1d.pow1
-
-    ids = get_stack_ids()
-    rsps = get_response([])
-    bkg_scales = get_bkg_scale([])
+# bkg_model = const1d.cID * acis_bkg_model('acis7s')
 
 for i in range(2):
     id_ = i + 1
@@ -45,8 +39,9 @@ freeze(c1.c0)
 freeze(c2.c0)
 
 src_model = xsphabs.abs1 * powlaw1d.pow1
-set_full_model(1,rsp_1(src_model) + bkg_scale_1 * bkg_rsp_1(bkg_model_1))
-set_full_model(2,rsp_2(src_model) + bkg_scale_2 * bkg_rsp_2(bkg_model_2))
+for i in range(2):
+    id_ = i + 1
+    set_full_model(id_, rsps[i](src_model) + bkg_scales[i] * bkg_rsps[i](bkg_models[i]))
 
 set_par(abs1.nh,0.0398)
 freeze(abs1)
