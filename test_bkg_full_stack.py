@@ -12,38 +12,26 @@ load_bkg_arf([], "acisf04938_000N002_r0043_arf3.fits")
 load_bkg_arf([], "acisf07867_000N001_r0002_arf3.fits")
 
 bkg_arfs = get_bkg_arf([])
+bkg_rmfs = get_bkg_rmf([])
+
+rsps = get_response([])
+bkg_scales = get_bkg_scale([])
+bkg_models = [const1d.c1 * acis_bkg_model('acis7s'),
+              const1d.c2 * acis_bkg_model('acis7s')]
+bkg_rsps = get_response([], bkg_id=1)
 
 if 0:
     bkg_model = scale1d.bkg_constID * acis_bkg_model('acis2i')
     src_model = const1d.src_constID * xsphabs.abs1 * powlaw1d.pow1
 
     ids = get_stack_ids()
-    src_bkg_rmfs = [unpack_rmf(x.name) for x in get_bkg_rmf([])]
-    bkg_bkg_rmfs = [unpack_rmf(x.name) for x in get_bkg_rmf([])]
     rsps = get_response([])
     bkg_scales = get_bkg_scale([])
 
-
-# background for the 1 data set
-
-bkg_arf_1 = bkg_arfs[0]
-bkg_arf_1.specresp = bkg_arf_1.specresp * 0 + 1.
-bkg_rmf_1= get_bkg_rmf(1)
-bkg_scale_1 = get_bkg_scale(1)
-rsp_1 = get_response(1)
-bkg_rsp_1 = get_response(bkg_id=1)
-bkg_model_1 = const1d.c1 * acis_bkg_model('acis7s')
-set_bkg_full_model(1,bkg_rsp_1(bkg_model_1))
-
-# background for the 2 data set
-bkg_arf_2 = bkg_arfs[1]
-bkg_arf_2.specresp = bkg_arf_2.specresp * 0 + 1.
-bkg_rmf_2= get_bkg_rmf(2)
-bkg_scale_2 = get_bkg_scale(2)
-rsp_2 = get_response(2)
-bkg_rsp_2=get_response(2,bkg_id=1)
-bkg_model_2= const1d.c2 * acis_bkg_model('acis7s')
-set_bkg_full_model(2,bkg_rsp_2(bkg_model_2))
+for i in range(2):
+    id_ = i + 1
+    bkg_arfs[i].specresp = bkg_arfs[i].specresp * 0 + 1.
+    set_bkg_full_model(id_, bkg_rsps[i](bkg_models[i]))
 
 # Fitting Background:
 set_method("neldermead")
@@ -64,3 +52,20 @@ set_par(abs1.nh,0.0398)
 freeze(abs1)
 fit()
 # plot_fit([])
+
+# Final fit statistic   = -11105.6 at function evaluation 64
+# Data points           = 1028
+# Degrees of freedom    = 1026
+# Change in statistic   = 0
+#    c1.c0          1659.79     
+#    c2.c0          21.7327     
+# Datasets              = 1, 2
+# Method                = neldermead
+# Statistic             = cash
+# Initial fit statistic = -12502.7
+# Final fit statistic   = -12502.7 at function evaluation 299
+# Data points           = 2056
+# Degrees of freedom    = 2054
+# Change in statistic   = 0
+#    pow1.gamma     1.86691     
+#    pow1.ampl      4.38031e-05 
