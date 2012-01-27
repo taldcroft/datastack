@@ -6,7 +6,7 @@ load_pha([], 'acisf04938_000N002_r0043_pha3.fits')
 load_pha([], 'acisf07867_000N001_r0002_pha3.fits')
 
 bkg_model = scale1d.bkg_constID * acis_bkg_model('acis2i')
-src_model = const1d.src_constID * xsphabs.abs * powlaw1d.pow
+src_model = const1d.src_constID * xsphabs.abs1 * powlaw1d.pow1
 
 ids = get_stack_ids()
 src_bkg_rmfs = [unpack_rmf(x.name) for x in get_bkg_rmf([])]

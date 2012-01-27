@@ -1,6 +1,6 @@
 from distutils.core import setup
 setup(name='datastack',
-      version='0.1.0',
+      version='0.1.1',
       description='Sherpa datastack extension package',
       author='Tom Aldcroft',
       url='http://cxc.harvard.edu/contrib/datastack/',
