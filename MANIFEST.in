@@ -2,4 +2,6 @@ include doc/*.rst
 include examples/*.py
 exclude test_*
 exclude print_sherpa_synopses.py
-include test_pha_arf_session.py
+include test_bkg_full_stack.py
+include acis_bkg_model.py
+
