@@ -2,7 +2,7 @@ from datastack import *
 from acis_bkg_model import acis_bkg_model
 
 clear_stack()
-datadir = 'data/'
+datadir = 'examples/data/'
 load_pha([], datadir + 'acisf04938_000N002_r0043_pha3.fits')
 load_pha([], datadir + 'acisf07867_000N001_r0002_pha3.fits')
 
@@ -45,7 +45,7 @@ src_models = [src_model,
 for i in range(2):
     id_ = i + 1
     set_full_model(id_, (rsps[i](src_models[i])
-                         + bkg_scales[i] * bkg_rsps[i](bkg_models[i])))
+                         + bkg_scales[i] * const1d.c3)) #  bkg_models[i]))
 
 set_par(abs1.nh, 0.0398)
 freeze(abs1)

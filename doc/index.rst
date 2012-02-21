@@ -36,7 +36,7 @@ also work in the case of 20 or even 100 spectra, at which point the utility of
   subtract([])
   group_counts([], 10)
   notice([], 0.5, 7)
-  set_source([], 'xsphabs.gal * powlaw1d.pow#')
+  set_source([], xsphabs.gal * powlaw1d.powID)
   link([], 'pow.gamma')
   set_par([], 'gal.nh', 0.04)
   fit([])
@@ -142,7 +142,7 @@ fitting four X-ray spectra with a power law and Galactic absorption::
   ignore([], 7, None)
   subtract([])
 
-  set_source([], 'xsphabs.gal * powlaw1d.pow#')
+  set_source([], xsphabs.gal * powlaw1d.powID)
   link([], 'pow.gamma')
   set_par([], 'gal.nh', 0.04)
   freeze([], "gal.nh")
@@ -198,22 +198,18 @@ Next is setting the source model for fitting.  This is where the |datastack|
 module is doing more than simply iterating over the native Sherpa
 commands::
 
-  set_source([], "xsphabs.gal * powlaw1d.pow#")
+  set_source([], xsphabs.gal * powlaw1d.powID)
 
 In this example there is a common galactic absorption that applies for all
 datasets but we want an independent power law component for each.  We use the
-usual Sherpa model syntax but insert the ``#`` character in the model component
+usual Sherpa model syntax but insert the ``ID`` string in the model component
 name to tell ``set_source()`` to create an independent powerlaw component for each
 dataset. The above command is essentially equivalent to the following::
 
-  set_source(1, "xsphabs.gal * powlaw1d.pow1")
-  set_source(2, "xsphabs.gal * powlaw1d.pow2")
-  set_source(3, "xsphabs.gal * powlaw1d.pow3")
-  set_source(4, "xsphabs.gal * powlaw1d.pow4")
-
-To support this extended syntax the model definition *must* be a
-Python string, unlike the native Sherpa command that allows for a Python
-expression e.g. ``set_source(1, xsphabs.gal * powlaw1d.pow1)``.
+  set_source(1, xsphabs.gal * powlaw1d.pow1)
+  set_source(2, xsphabs.gal * powlaw1d.pow2)
+  set_source(3, xsphabs.gal * powlaw1d.pow3)
+  set_source(4, xsphabs.gal * powlaw1d.pow4)
 
 Now let's say that we want to fit just a single powerlaw photon index gamma
 for the data stack but leave the normalizations independent.  This is done by
@@ -221,8 +217,9 @@ linking the gamma parameters::
 
   link([], "pow.gamma")
 
-Notice that the ``#`` is only needed when setting the source model.  In all the
-other commands that refer to model components there is no need for the ``#``.
+Notice that the ``ID`` is only needed when setting the source model.  In all the
+other commands that refer to model components there is no need for the ``ID`` 
+(and in fact you cannot supply it).
 
 Now we need to set the initial powerlaw index and then set the Galactic
 absorption and freeze it::
@@ -318,15 +315,17 @@ load_pha       Load PHA data by id
 Model definition
 ----------------
 
-The |datastack| module supports three model definition commands:
+The |datastack| module supports five model definition commands:
 
-=============  ==========================================
-Command        Description
-=============  ==========================================
-set_model      Set a Sherpa model by model id
-set_source     Set a Sherpa model by model id (alias)
-set_bkg_model  Set a bkg model by data id and bkg id
-=============  ==========================================
+=================== ==========================================
+Command             Description
+=================== ==========================================
+set_model           Set a Sherpa model by model id
+set_source          Set a Sherpa model by model id (alias)
+set_bkg_model       Set a bkg model by data id and bkg id
+set_full_model      Same as Sherpa set_full_model
+set_bkg_full_model  Same as Sherpa set_bkg_full_model
+==================  ==========================================
 
 For each of these commands |datastack| extends the Sherpa model definition
 language to substitute the dataeset ``id`` for any instance the ``#`` symbol
@@ -337,10 +336,10 @@ powlaw1d.pow1)``.
 
 Consider this example::
 
-  set_source([], "xsphabs.gal * powlaw1d.pow_#")
+  set_source([], "xsphabs.gal * powlaw1d.pow_ID")
 
 Here there is a common model (``gal``) that applies for all datasets
-and an independent model ``pow#`` for each dataset.  The above command
+and an independent model ``pow_ID`` for each dataset.  The above command
 is essentially equivalent to the following::
 
   set_source(1, "xsphabs.gal * powlaw1d.pow_1")

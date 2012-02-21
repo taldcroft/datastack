@@ -1,4 +1,4 @@
-WWW = /proj/web-cxc/htdocs/contrib/datastack
+WWW = /proj/web-cxc-dmz/htdocs/contrib/datastack
 
 .PHONY: doc dist
 
@@ -14,4 +14,4 @@ doc:
 
 install:
 	rsync -av doc/_build/html/ $(WWW)/
-	rsync -av dist/datastack-*.tar.gz examples_data.tar.gz $(WWW)/downloads/
+	rsync -av doc/index.html dist/datastack-*.tar.gz examples_data.tar.gz $(WWW)/downloads/

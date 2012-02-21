@@ -15,8 +15,8 @@ ignore(ds[3,4], 6.0, None) # Ignore more for datasets 3, 4
 
 subtract(ds)
 
-set_source(ds[1,3], 'xsphabs.gal * powlaw1d.pow#')
-set_source(ds[2,4], 'xsphabs.gal * powlaw1d.pow# + gauss1d.gauss#')
+set_source(ds[1,3], xsphabs.gal * powlaw1d.powID)
+set_source(ds[2,4], xsphabs.gal * powlaw1d.powID + gauss1d.gaussID)
 
 set_par(ds, 'gauss.fwhm', 0.5)
 set_par(ds, 'gauss.pos', 5)

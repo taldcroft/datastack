@@ -12,7 +12,7 @@ ignore([], None, 0.5)
 ignore([], 7, None)
 subtract([])
 
-set_source([], "xsphabs.gal * powlaw1d.pow#")
+set_source([], xsphabs.gal * powlaw1d.powID)
 link([], "pow.gamma")
 set_par([], "gal.nh", 0.04)
 freeze([], "gal.nh")
