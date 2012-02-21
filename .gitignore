@@ -1,0 +1,7 @@
+doc/_build
+doc/_static
+doc/_templates
+build
+MANIFEST
+examples_data.tar.gz
+examples/data
