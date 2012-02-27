@@ -75,12 +75,12 @@ There are three methods for installing.  Choose ONE of the three.
 **Best:**
 
 The following command installs the ``datastack`` module to
-``$HOME/.local/lib/python2.6``::
+``$HOME/.local/lib/python2.7``::
 
   python setup.py install --user
 
 Using the ``--user`` switch you can make a local repository of packages that
-will run within Sherpa and/or the system python 2.6.
+will run within Sherpa and/or the system Python 2.7.
 
 **Also good:**
 
@@ -325,7 +325,7 @@ set_source          Set a Sherpa model by model id (alias)
 set_bkg_model       Set a bkg model by data id and bkg id
 set_full_model      Same as Sherpa set_full_model
 set_bkg_full_model  Same as Sherpa set_bkg_full_model
-==================  ==========================================
+=================== ==========================================
 
 For each of these commands |datastack| extends the Sherpa model definition
 language to substitute the dataeset ``id`` for any instance the ``#`` symbol
@@ -366,7 +366,7 @@ The `get_par`_ and `set_par`_ commands are extended in |datastack| to accept
 *any* attribute of a model component and not just a parameter name.  For
 instance::
 
-  set_source([], "gauss1d.gauss#")       # create model components "gauss#"
+  set_source([], "gauss1d.gaussID")      # create model components "gaussID"
   set_par([], "gauss.integrate", False)  # disable model integration for stack
   set_par([], "gauss.fwhm.min", 2.0)     # set min for gauss.fwhm parameter
   set_par([], "gauss.pos", 5.0)          # set gauss.pos parameter value
