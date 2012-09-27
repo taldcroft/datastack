@@ -99,11 +99,14 @@ def create_stack_model(model, id_, id_str='ID'):
 
             if hasattr(model, 'op'):
                 return model.op(*newparts)
-            elif isinstance(model, sherpa.astro.instrument.RMFModel):
-                return sherpa.astro.instrument.RMFModel(rmf=model.rmf, model=newparts[0],
+            elif isinstance(model, sherpa.astro.instrument.RSPModelPHA):
+                return sherpa.astro.instrument.RSPModelPHA(rmf=model.rmf, model=newparts[0],
                                                         arf=model.arf, pha=model.pha)
-            elif isinstance(model, sherpa.astro.instrument.ARFModel):
-                return sherpa.astro.instrument.ARFModel(rmf=model.rmf, model=newparts[0],
+            elif isinstance(model, sherpa.astro.instrument.RMFModelPHA):
+                return sherpa.astro.instrument.RSPModelPHA(rmf=model.rmf, model=newparts[0],
+                                                        arf=model.arf, pha=model.pha)
+            elif isinstance(model, sherpa.astro.instrument.ARFModelPHA):
+                return sherpa.astro.instrument.ARFModelPHA(rmf=model.rmf, model=newparts[0],
                                                         arf=model.arf, pha=model.pha)
             else:
                 raise ValueError("Unexpected composite model {0} (not operator, ARF or RMF)".format(repr(model)))
