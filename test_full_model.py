@@ -1,7 +1,7 @@
 import numpy as np
 from sherpa.astro.ui import *
 
-load_pha('acisf04938_000N002_r0043_pha3.fits')
+load_pha('examples/data/acisf04938_000N002_r0043_pha3.fits')
 
 
 rmf = get_rmf()
@@ -19,7 +19,6 @@ bkg_arf = get_bkg_arf()
 bkg_rmf = get_bkg_rmf()
 
 src_model = rmf(arf(powlaw1d.pow1))
-#bkg_model = bkg_rmf(bkg_arf(const1d.bkg_constID))
 bkg_model = bkg_rmf(bkg_arf(const1d.bkg_constID))
 src_bkg_model = src_bkg_rmf(src_bkg_arf(const1d.bkg_constID))
 bkg_scale = get_data().sum_background_data(lambda x,y:1)
